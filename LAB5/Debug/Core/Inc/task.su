@@ -1,0 +1,6 @@
+task.c:9:6:TASK_Init	8	static
+task.c:16:6:Task_Blink	8	static
+task.c:22:6:Task_TimerRun	8	static
+task.c:27:6:Task_FSM_Community	8	static
+task.c:32:6:Task_FSM_Parser	8	static
+task.c:37:6:Task_check	4	static
