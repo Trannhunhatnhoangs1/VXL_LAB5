@@ -1,4 +1,4 @@
-Core/Inc/task.o: ../Core/Inc/task.c ../Core/Inc/task.h ../Core/Inc/main.h \
+Core/Src/task.o: ../Core/Src/task.c ../Core/Inc/task.h ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \

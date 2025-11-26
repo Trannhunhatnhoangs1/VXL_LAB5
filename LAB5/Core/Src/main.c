@@ -66,7 +66,7 @@ int main(void)
       HAL_ADC_Start(&hadc1);
 //      SCH_Init();
 //      TASK_Init();
-
+      setTimer2(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -74,6 +74,10 @@ int main(void)
   while (1)
   {
 	  //SCH_Dispatch_Tasks();
+	  if(timer2_flag==1){
+		    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+		    setTimer2(1000);
+	  }
 	  if (buffer_flag) {
 			  command_parser_fsm();
 			  buffer_flag = 0;

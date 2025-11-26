@@ -20,5 +20,4 @@ void Task_Blink(void);    // chớp tắt PA5 mỗi 1s
 void Task_TimerRun(void);    // gọi timer_run()
 void Task_FSM_Community(void);
 void Task_FSM_Parser(void);
-void Task_check(void);
 #endif /* INC_TASK_H_ */
