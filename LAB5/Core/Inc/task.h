@@ -15,7 +15,6 @@
 #include "software_timer.h"
 #include"global.h"
 
-void TASK_Init(void);
 void Task_Blink(void);    // chớp tắt PA5 mỗi 1s
 void Task_TimerRun(void);    // gọi timer_run()
 void Task_FSM_Community(void);

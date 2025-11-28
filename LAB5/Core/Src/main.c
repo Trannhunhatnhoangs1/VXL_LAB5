@@ -24,7 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-//#include"task.h"
+#include"task.h"
 #include "global.h"
 #include "fsm_parser.h"
 #include "fsm_communication.h"
@@ -61,28 +61,23 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
-  	  HAL_UART_Receive_IT(&huart2, &temp, 1);
-      HAL_TIM_Base_Start_IT(&htim2);
-      HAL_ADC_Start(&hadc1);
-//      SCH_Init();
-//      TASK_Init();
-      setTimer2(1000);
+  HAL_UART_Receive_IT(&huart2, &temp, 1);
+  HAL_TIM_Base_Start_IT(&htim2);
+  HAL_ADC_Start(&hadc1);
+
+  SCH_Init();
+  SCH_Add_Task(Task_Blink, 0, 1000);
+  SCH_Add_Task(Task_TimerRun, 0, 10);
+  SCH_Add_Task( Task_FSM_Parser, 1, 10);
+  SCH_Add_Task(Task_FSM_Community, 1, 10);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //SCH_Dispatch_Tasks();
-	  if(timer2_flag==1){
-		    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-		    setTimer2(1000);
-	  }
-	  if (buffer_flag) {
-			  command_parser_fsm();
-			  buffer_flag = 0;
-		  }
-		  uart_communiation_fsm();
+	  SCH_Dispatch_Tasks();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -340,8 +335,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	 if (htim->Instance == TIM2) {
-	       // SCH_Update();
-		 timerRun();
+	        SCH_Update();
 	    }
 }
 /* USER CODE END 4 */

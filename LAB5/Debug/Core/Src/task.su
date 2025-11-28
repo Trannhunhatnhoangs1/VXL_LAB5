@@ -1,5 +1,4 @@
-task.c:11:6:TASK_Init	8	static
-task.c:17:6:Task_Blink	8	static
-task.c:23:6:Task_TimerRun	8	static
-task.c:28:6:Task_FSM_Community	8	static
-task.c:33:6:Task_FSM_Parser	8	static
+task.c:12:6:Task_Blink	8	static
+task.c:18:6:Task_TimerRun	8	static
+task.c:23:6:Task_FSM_Community	8	static
+task.c:28:6:Task_FSM_Parser	8	static

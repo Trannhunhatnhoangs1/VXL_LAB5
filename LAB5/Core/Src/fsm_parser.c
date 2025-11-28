@@ -33,6 +33,8 @@ void command_parser_fsm() {
         }
         else parser_status = INIT;
         break;
+
+
     case _RST_:
         if (buffer[index] == '!') parser_status = END;
         break;

@@ -10,103 +10,68 @@
 
 #include "scheduler.h"
 
-int TIME_CYCLE = 1;
+sTask SCH_tasks_G[SCH_MAX_TASK];
 
-
-sTasks* timer_wheel[WHEEL_SIZE];
-uint8_t current_slot = 0;
-
-static sTasks task_pool[SCH_MAX_TASKS];
-static uint8_t task_count = 0;
+int numTask = 0;
 
 void SCH_Init(void) {
-    for (int i = 0; i < WHEEL_SIZE; i++) {
-        timer_wheel[i] = 0;
-    }
-    task_count = 0;
-    current_slot = 0;
+	unsigned char i;
+	for (i = 0; i < SCH_MAX_TASK; i++) {
+		SCH_Delete_Task(i);
+	}
 }
 
-uint32_t SCH_Add_Task(void (*pFunction)(), uint32_t DELAY, uint32_t PERIOD) {
-    if (task_count >= SCH_MAX_TASKS)
-        return -1;
 
-    sTasks* t = &task_pool[task_count];
+void SCH_Add_Task(void (*pFunction)(void), uint32_t DELAY, uint32_t PERIOD) {
+    if (numTask < SCH_MAX_TASK) {
+        uint8_t index;
+        for (index = 0; index < SCH_MAX_TASK; index++) {
+            if (SCH_tasks_G[index].pTask != 0) continue;
 
-    t->pTask = pFunction;
-    t->Delay = DELAY / TIME_CYCLE;
-    t->Period = PERIOD / TIME_CYCLE;
-    t->RunMe = 0;
-    t->TaskID = task_count;
-    t->next = 0;
-
-    uint32_t targetSlot = (current_slot + t->Delay) % WHEEL_SIZE;
-
-    t->next = timer_wheel[targetSlot];
-    timer_wheel[targetSlot] = t;
-
-    task_count++;
-    return t->TaskID;
-}
-
-uint8_t SCH_Delete_Task(uint32_t taskID) {
-    if (taskID >= task_count) return -1;
-
-    sTasks* t = &task_pool[taskID];
-
-
-    for (int i = 0; i < WHEEL_SIZE; i++) {
-        sTasks* prev = 0;
-        sTasks* p = timer_wheel[i];
-
-        while (p != 0) {
-            if (p == t) {
-                if (prev == 0)
-                    timer_wheel[i] = p->next;
-                else
-                    prev->next = p->next;
-
-                t->pTask = 0;
-                t->next = 0;
-                return 1;
-            }
-            prev = p;
-            p = p->next;
+            SCH_tasks_G[index].pTask = pFunction;
+            SCH_tasks_G[index].Delay = DELAY / TIME_CYCLE;
+            SCH_tasks_G[index].Period = PERIOD / TIME_CYCLE;
+            SCH_tasks_G[index].RunMe = 0;
+            SCH_tasks_G[index].TaskID = index;
+            numTask++;
+            break;
         }
     }
-    return 0;
 }
 
 void SCH_Update(void) {
-    current_slot = (current_slot + 1) % WHEEL_SIZE;
-
+	unsigned char index;
+	for (index = 0; index < SCH_MAX_TASK; index++) {
+		if (SCH_tasks_G[index].pTask) {
+			if (SCH_tasks_G[index].Delay == 0) {
+				SCH_tasks_G[index].RunMe += 1;
+				if (SCH_tasks_G[index].Period) {
+					SCH_tasks_G[index].Delay = SCH_tasks_G[index].Period;
+				}
+			}
+			else {
+				SCH_tasks_G[index].Delay -= 1;
+			}
+		}
+	}
 }
 
 void SCH_Dispatch_Tasks(void) {
-    sTasks* p = timer_wheel[current_slot];
-    timer_wheel[current_slot] = 0;
-
-    while (p != 0) {
-        sTasks* nextTask = p->next;
-
-        p->RunMe++;
-
-        // Chạy task
-        if (p->RunMe > 0) {
-            p->RunMe--;
-            (*p->pTask)();
-        }
-
-        if (p->Period == 0) {
-            SCH_Delete_Task(p->TaskID);
-        } else {
-            uint32_t nextSlot = (current_slot + p->Period) % WHEEL_SIZE;
-            p->next = timer_wheel[nextSlot];
-            timer_wheel[nextSlot] = p;
-        }
-
-        p = nextTask;
-    }
+	unsigned char index;
+	for (index = 0; index < SCH_MAX_TASK; index++) {
+		if (SCH_tasks_G[index].RunMe > 0) {
+			(*SCH_tasks_G[index].pTask)();
+			SCH_tasks_G[index].RunMe -= 1;
+			if (SCH_tasks_G[index].Period == 0) SCH_Delete_Task(index);
+		}
+	}
 }
 
+void SCH_Delete_Task(uint32_t taskID) {
+	if (taskID >= SCH_MAX_TASK || SCH_tasks_G[taskID].pTask == 0) return;
+	SCH_tasks_G[taskID].pTask = 0x0000;
+	SCH_tasks_G[taskID].Delay = 0;
+	SCH_tasks_G[taskID].Period = 0;
+	SCH_tasks_G[taskID].RunMe = 0;
+}
 #endif /* SRC_SCHEDULER_C_ */

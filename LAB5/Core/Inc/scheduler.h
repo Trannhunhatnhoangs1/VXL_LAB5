@@ -8,23 +8,25 @@
 
 #include <stdint.h>
 
-#define SCH_MAX_TASKS   40
-#define WHEEL_SIZE      256
+#define SCH_MAX_TASK	12
+#define NO_TASK_ID 		0
+#define TIME_CYCLE 10
+#include <stdint.h>
+#include "main.h"
+#include "software_timer.h"
 
-extern int TIME_CYCLE;
+typedef struct {
+	void (* pTask)(void);
+	uint32_t Delay;
+	uint32_t Period;
+	uint8_t RunMe;
+	uint32_t TaskID;
+}sTask;
 
-typedef struct sTask {
-    void (*pTask)(void);
-    uint32_t Delay;
-    uint32_t Period;
-    uint8_t  RunMe;
-    uint32_t TaskID;
 
-    struct sTask* next;
-} sTasks;
 
 void SCH_Init(void);
-void SCH_Update(void);
-void SCH_Dispatch_Tasks(void);
-uint32_t SCH_Add_Task(void (*pFunction)(), uint32_t DELAY, uint32_t PERIOD);
-uint8_t SCH_Delete_Task(uint32_t taskID);
+void SCH_Update(void);//nhu timer_run
+void SCH_Dispatch_Tasks(void);// nhu timer_flag
+void SCH_Add_Task(void (*pFunction)(void), uint32_t DELAY_ms, uint32_t PERIOD_ms);// nhu settimer
+void SCH_Delete_Task(uint32_t index);
